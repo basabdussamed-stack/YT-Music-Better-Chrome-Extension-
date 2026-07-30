@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "YT Music Better",
+  "version": "1.2.0",
+  "description": "Enhance YouTube Music with panel toggle, quality selector, repeat control, custom themes & more.",
+  "author": "Samet Baş",
+  "icons": {
+    "16":  "icon.png",
+    "48":  "icon.png",
+    "128": "icon.png"
+  },
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://music.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://music.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_title": "YTM Enhancer",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16":  "icon.png",
+      "48":  "icon.png",
+      "128": "icon.png"
+    }
+  }
+}

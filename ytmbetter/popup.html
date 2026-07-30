@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YTM Enhancer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent:      #ff4e4e;
+      --accent-dim:  rgba(255, 78, 78, 0.15);
+      --accent-glow: rgba(255, 78, 78, 0.25);
+      --bg:          #080808;
+      --surface:     #111111;
+      --surface2:    #181818;
+      --border:      rgba(255, 255, 255, 0.06);
+      --border2:     rgba(255, 255, 255, 0.1);
+      --text:        #ffffff;
+      --text-mid:    rgba(255, 255, 255, 0.65);
+      --text-dim:    rgba(255, 255, 255, 0.35);
+      --radius-lg:   16px;
+      --radius-md:   12px;
+      --radius-sm:   8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 360px;
+      min-height: 100px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    .header {
+      padding: 18px 18px 16px;
+      background: linear-gradient(160deg, #161616 0%, #0e0e0e 100%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative glow blobs */
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -20px;
+      width: 130px; height: 130px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: 30px;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(100,100,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-logo {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent) 0%, #ff8c42 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 6px 20px var(--accent-glow), 0 0 0 1px rgba(255,255,255,0.08) inset;
+      position: relative;
+      z-index: 1;
+    }
+    .header-logo svg { width: 22px; height: 22px; fill: #fff; }
+
+    .header-text { flex: 1; position: relative; z-index: 1; }
+    .header-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+    .header-text p {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .header-version {
+      position: relative; z-index: 1;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(255,78,78,0.18);
+      border-radius: 20px;
+      padding: 3px 9px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── CONTENT ─────────────────────────────────────────── */
+    .content {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 560px;
+      overflow-y: auto;
+    }
+    .content::-webkit-scrollbar { width: 3px; }
+    .content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* ── SECTION ─────────────────────────────────────────── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 7px;
+      padding-left: 2px;
+    }
+
+    /* ── CARD ────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    /* ── CONTROL ROW ─────────────────────────────────────── */
+    .control-row {
+      display: flex;
+      align-items: center;
+      padding: 11px 14px;
+      gap: 12px;
+      transition: background .15s;
+      border-bottom: 1px solid var(--border);
+      cursor: default;
+    }
+    .control-row:last-child { border-bottom: none; }
+    .control-row:hover { background: rgba(255,255,255,0.025); }
+
+    .ctrl-icon {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ctrl-icon svg { width: 17px; height: 17px; fill: currentColor; }
+    .ctrl-icon.red    { background: rgba(255,78,78,0.12);   color: #ff6b6b; }
+    .ctrl-icon.blue   { background: rgba(74,160,255,0.12);  color: #4aa0ff; }
+    .ctrl-icon.green  { background: rgba(52,211,153,0.12);  color: #34d399; }
+    .ctrl-icon.purple { background: rgba(167,139,250,0.12); color: #a78bfa; }
+
+    .ctrl-info { flex: 1; min-width: 0; }
+    .ctrl-info strong {
+      font-size: 13px; font-weight: 600;
+      display: block; line-height: 1.3;
+    }
+    .ctrl-info span {
+      font-size: 11px; color: var(--text-dim);
+      display: block; margin-top: 1px;
+    }
+
+    /* ── TOGGLE SWITCH ───────────────────────────────────── */
+    .toggle-input { display: none; }
+    .toggle-label {
+      width: 42px; height: 24px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: block;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+    .toggle-label::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: transform .22s cubic-bezier(0.34,1.3,0.64,1), background .2s;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    }
+    .toggle-input:checked + .toggle-label { background: var(--accent); }
+    .toggle-input:checked + .toggle-label::after { transform: translateX(18px); }
+
+    /* ── CHIP BUTTON ─────────────────────────────────────── */
+    .chip-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text-mid);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all .14s;
+      white-space: nowrap;
+    }
+    .chip-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.18); }
+    .chip-btn:active { transform: scale(0.96); }
+
+    /* ── QUALITY GRID ────────────────────────────────────── */
+    .quality-wrap {
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .q-pill {
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text-mid);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .15s;
+      line-height: 1;
+    }
+    .q-pill:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+    .q-pill.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 3px 12px var(--accent-glow);
+    }
+
+    /* ── COLOR GRID ──────────────────────────────────────── */
+    .color-wrap {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .color-swatch {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: transform .15s, border-color .15s, box-shadow .15s;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .color-swatch:hover { transform: scale(1.14); }
+    .color-swatch.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.1);
+      transform: scale(1.1);
+    }
+    .color-swatch.selected::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* ── SHORTCUTS ───────────────────────────────────────── */
+    .shortcut-list {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .shortcut-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .shortcut-desc { font-size: 12.5px; color: var(--text-mid); }
+    .shortcut-keys { display: flex; gap: 3px; }
+    .shortcut-keys kbd {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-mid);
+      letter-spacing: 0.3px;
+    }
+
+    /* ── STATUS INDICATOR ────────────────────────────────── */
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px rgba(52,211,153,0.6);
+      flex-shrink: 0;
+      animation: ytme-pulse 2s ease-in-out infinite;
+    }
+    @keyframes ytme-pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    .footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-left {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .footer span { font-size: 10.5px; color: var(--text-dim); }
+    .footer a {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color .14s;
+    }
+    .footer a:hover { color: var(--accent); }
+
+    /* ── DIVIDER ─────────────────────────────────────────── */
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>YTM Enhancer</h1>
+      <p>music.youtube.com</p>
+    </div>
+    <div class="header-version">v1.2</div>
+  </div>
+
+  <!-- ── Content ─────────────────────────────────────── -->
+  <div class="content">
+
+    <!-- Player Controls -->
+    <div>
+      <div class="section-label">Player Controls</div>
+      <div class="card">
+
+        <!-- Panel toggle -->
+        <div class="control-row">
+          <div class="ctrl-icon red">
+            <svg viewBox="0 0 24 24"><path d="M3 18h13v-2H3v2zm0-5h10v-2H3v2zm0-7v2h13V6H3zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5L21 15.59z"/></svg>
+          </div>
+          <div class="ctrl-info">
+            <strong>Side Panel</strong>
+            <span>Hide or show right panel</span>
+          </div>
+          <input type="checkbox" class="toggle-input" id="panel-toggle"/>
+          <label class="toggle-label" for="panel-toggle"></label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Video Quality -->
+    <div>
+      <div class="section-label">Video Quality</div>
+      <div class="card">
+        <div class="quality-wrap" id="quality-grid">
+          <!-- populated by popup.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Accent Color -->
+    <div>
+      <div class="section-label">Accent Color</div>
+      <div class="card">
+        <div class="color-wrap" id="color-grid">
+          <!-- populated by popup.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts -->
+    <div>
+      <div class="section-label">Keyboard Shortcuts</div>
+      <div class="card">
+        <div class="shortcut-list">
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Hide / Show Panel</span>
+            <div class="shortcut-keys"><kbd>Alt</kbd><kbd>P</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Quality Menu</span>
+            <div class="shortcut-keys"><kbd>Alt</kbd><kbd>Q</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Toggle Repeat</span>
+            <div class="shortcut-keys"><kbd>Alt</kbd><kbd>R</kbd></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────── -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Active on this tab</span>
+    </div>
+    <a href="https://github.com" target="_blank">GitHub ↗</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
